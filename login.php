@@ -12,7 +12,7 @@ switch ($method) {
         $email = $_GET['username'];
         $password = $_GET['password'];
 
-        $sql = "SELECT * FROM users WHERE user_username = :username AND user_password = :password";
+        $sql = "SELECT * FROM students WHERE (username = :username AND password = :password) AND type = 'student'";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $email);
         $stmt->bindParam(':password', $password);

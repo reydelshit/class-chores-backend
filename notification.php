@@ -12,16 +12,15 @@ switch ($method) {
 
         if (isset($_GET['receiver_id'])) {
             $receiver_id = $_GET['receiver_id'];
-            $user_id = $_GET['user_id'];
-            $sql = "SELECT * FROM notifications INNER JOIN users ON notifications.receiver_id = users.patient_id WHERE receiver_id = :receiver_id AND users.user_id = :user_id  ORDER BY notification_id DESC";
+
+            $sql = "SELECT * FROM notifications WHERE notifications.receiver_id = :receiver_id ORDER BY notifications.notification_id DESC";
         }
 
         if (isset($sql)) {
             $stmt = $conn->prepare($sql);
 
-            if (isset($receiver_id) && isset($user_id)) {
+            if (isset($receiver_id)) {
                 $stmt->bindParam(':receiver_id', $receiver_id);
-                $stmt->bindParam(':user_id', $user_id);
             }
 
             $stmt->execute();

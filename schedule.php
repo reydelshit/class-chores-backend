@@ -86,7 +86,7 @@ switch ($method) {
         break;
 
     case "DELETE":
-        $sql = "DELETE FROM appointments WHERE sched_id = :id";
+        $sql = "DELETE FROM schedule WHERE sched_id = :id";
         $path = explode('/', $_SERVER['REQUEST_URI']);
 
         $stmt = $conn->prepare($sql);
