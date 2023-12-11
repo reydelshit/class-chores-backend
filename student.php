@@ -10,28 +10,28 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case "GET":
 
-        if (isset($_GET['patient_id'])) {
-            $patient_id_specific = $_GET['patient_id'];
+        if (isset($_GET['student_id'])) {
+            $student_id_specific = $_GET['student_id'];
             $sql = "SELECT *
-            FROM patient
-            WHERE patient_id = :patient_id";
+            FROM students
+            WHERE student_id = :student_id";
         }
 
-        if (!isset($_GET['patient_id'])) {
-            $sql = "SELECT * FROM patient ORDER BY patient_id DESC";
+        if (!isset($_GET['student_id'])) {
+            $sql = "SELECT * FROM students ORDER BY student_id DESC";
         }
 
         if (isset($sql)) {
             $stmt = $conn->prepare($sql);
 
-            if (isset($patient_id_specific)) {
-                $stmt->bindParam(':patient_id', $patient_id_specific);
+            if (isset($student_id_specific)) {
+                $stmt->bindParam(':student_id', $student_id_specific);
             }
 
             $stmt->execute();
-            $patient = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stud = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            echo json_encode($patient);
+            echo json_encode($stud);
         }
 
 
@@ -42,6 +42,8 @@ switch ($method) {
         $stud = json_decode(file_get_contents('php://input'));
         $sql = "INSERT INTO students (student_id, studentFirst, studentLast, image, groupAssigned) 
         VALUES (null,  :studentFirst, :studentLast, :image, :groupAssigned)";
+
+
         $stmt = $conn->prepare($sql);
         $created_at = date('Y-m-d H:i:s');
         $stmt->bindParam(':studentFirst', $stud->studentFirst);
