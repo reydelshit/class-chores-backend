@@ -52,7 +52,6 @@ switch ($method) {
         $stmt->bindParam(':groupAssigned', $stud->groupAssigned);
         $stmt->bindParam(':username', $stud->username);
         $stmt->bindParam(':password', $stud->password);
-
         $stmt->bindParam(':type', $stud->type);
 
 
@@ -74,18 +73,26 @@ switch ($method) {
         break;
 
     case "PUT":
-        $user = json_decode(file_get_contents('php://input'));
-        $sql = "UPDATE users SET name= :name, email=:email, gender=:gender, profile_picture=:profile_picture, address=:address, profile_description=:profile_description, updated_at=:updated_at WHERE user_id = :user_id";
+        $stud = json_decode(file_get_contents('php://input'));
+        $sql = "UPDATE students 
+        SET studentFirst = :studentFirst, 
+            studentLast = :studentLast, 
+            image = :image, 
+            groupAssigned = :groupAssigned, 
+            type = :type
+     
+        WHERE student_id = :student_id";
+
         $stmt = $conn->prepare($sql);
-        $updated_at = date('Y-m-d');
-        $stmt->bindParam(':user_id', $user->user_id);
-        $stmt->bindParam(':name', $user->name);
-        $stmt->bindParam(':email', $user->email);
-        $stmt->bindParam(':profile_picture', $user->profile_picture);
-        $stmt->bindParam(':address', $user->address);
-        $stmt->bindParam(':gender', $user->gender);
-        $stmt->bindParam(':profile_description', $user->profile_description);
-        $stmt->bindParam(':updated_at', $updated_at);
+
+
+        $stmt->bindParam(':studentFirst', $stud->studentFirst);
+        $stmt->bindParam(':studentLast', $stud->studentLast);
+        $stmt->bindParam(':image', $stud->image);
+        $stmt->bindParam(':groupAssigned', $stud->groupAssigned);
+        $stmt->bindParam(':type', $stud->type);
+        $stmt->bindParam(':student_id', $stud->student_id);
+
 
         if ($stmt->execute()) {
 
@@ -104,11 +111,12 @@ switch ($method) {
         break;
 
     case "DELETE":
-        $sql = "DELETE FROM users WHERE id = :id";
-        $path = explode('/', $_SERVER['REQUEST_URI']);
+        $sql = "DELETE FROM students WHERE student_id = :id";
+        $stud = json_decode(file_get_contents('php://input'));
+
 
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':id', $path[2]);
+        $stmt->bindParam(':id', $stud->id);
 
         if ($stmt->execute()) {
             $response = [
