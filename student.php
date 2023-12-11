@@ -40,8 +40,8 @@ switch ($method) {
 
     case "POST":
         $stud = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO students (student_id, studentFirst, studentLast, image, groupAssigned) 
-        VALUES (null,  :studentFirst, :studentLast, :image, :groupAssigned)";
+        $sql = "INSERT INTO students (student_id, studentFirst, studentLast, image, groupAssigned, type, password, username) 
+        VALUES (null,  :studentFirst, :studentLast, :image, :groupAssigned, :type, :password, :username)";
 
 
         $stmt = $conn->prepare($sql);
@@ -50,6 +50,10 @@ switch ($method) {
         $stmt->bindParam(':studentLast', $stud->studentLast);
         $stmt->bindParam(':image', $stud->image);
         $stmt->bindParam(':groupAssigned', $stud->groupAssigned);
+        $stmt->bindParam(':username', $stud->username);
+        $stmt->bindParam(':password', $stud->password);
+
+        $stmt->bindParam(':type', $stud->type);
 
 
         if ($stmt->execute()) {

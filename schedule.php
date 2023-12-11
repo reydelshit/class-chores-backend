@@ -11,50 +11,10 @@ switch ($method) {
     case "GET":
 
 
+        $sql = "SELECT sched_id AS id, sched_title AS title, start, end, allDay FROM schedule";
 
-        if (isset($_GET['patient_id'])) {
-            $patient_id_specific = $_GET['patient_id'];
-            $sql = "SELECT *
-            FROM appointments
-            WHERE patient_id = :patient_id
-              AND CURDATE() >= appointments.start
-              AND CURDATE() <= appointments.end";
-        }
-
-        if (isset($_GET['patient_id']) && isset($_GET['next_appointment'])) {
-            $patient_id_next_appointment = $_GET['patient_id'];
-            $sql = "SELECT *
-            FROM appointments
-            WHERE patient_id = :patient_id
-              AND appointments.start >= CURRENT_TIMESTAMP
-            ORDER BY appointments.start
-            LIMIT 1";
-        }
-
-        if (isset($_GET['patient_id']) && isset($_GET['all_appointments'])) {
-            $patient_id_all_appointment = $_GET['patient_id'];
-            $sql = "SELECT sched_id AS id, sched_title AS title, start, end, allDay, sched_status FROM appointments WHERE patient_id = :patient_id";
-        }
-
-        if (!isset($_GET['patient_id'])) {
-            $sql = "SELECT sched_id AS id, sched_title AS title, start, end, allDay FROM schedule";
-        }
         if (isset($sql)) {
             $stmt = $conn->prepare($sql);
-
-            if (isset($patient_id_specific)) {
-                $stmt->bindParam(':patient_id', $patient_id_specific);
-            }
-
-            if (isset($patient_id_next_appointment)) {
-                $stmt->bindParam(':patient_id', $patient_id_next_appointment);
-            }
-
-            if (isset($patient_id_all_appointment)) {
-                $stmt->bindParam(':patient_id', $patient_id_all_appointment);
-            }
-
-
 
             $stmt->execute();
             $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -67,8 +27,8 @@ switch ($method) {
 
     case "POST":
         $appointment = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO schedule (sched_id, sched_title, start, end, allDay, patient_id, sched_status) 
-                VALUES (null, :sched_title, :start, :end, :allDay, :patient_id, :sched_status)";
+        $sql = "INSERT INTO schedule (sched_id, sched_title, start, end, allDay, group_name) 
+                VALUES (null, :sched_title, :start, :end, :allDay, :group_name)";
         $stmt = $conn->prepare($sql);
         $created_at = date('Y-m-d H:i:s');
         $status = "Pending";
@@ -76,8 +36,8 @@ switch ($method) {
         $stmt->bindParam(':start', $appointment->start);
         $stmt->bindParam(':end', $appointment->end);
         $stmt->bindParam(':allDay', $appointment->allDay);
-        $stmt->bindParam(':patient_id', $appointment->patient_id);
-        $stmt->bindParam(':sched_status', $status);
+        $stmt->bindParam(':group_name', $appointment->selectedGroup);
+
 
 
         // $stmt->bindParam(':created_at', $created_at);
