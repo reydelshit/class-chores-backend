@@ -9,18 +9,20 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case "GET":
-        $email = $_GET['username'];
+        $username = $_GET['username'];
         $password = $_GET['password'];
 
-        $sql = "SELECT * FROM students WHERE (username = :username AND password = :password) AND type = 'student'";
+        $encrypted_username = md5($username);
+        $encrypted_password = md5($password);
+
+        $sql = "SELECT * FROM users WHERE username = :username AND password = :password";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':username', $email);
-        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':username', $encrypted_username);
+        $stmt->bindParam(':password', $encrypted_password);
         $stmt->execute();
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($users) {
-
 
             $response = [
                 "status" => "success",
@@ -29,7 +31,7 @@ switch ($method) {
         } else {
             $response = [
                 "status" => "error",
-                "message" => "Failed to update user login status"
+                "message" => "Failed to login "
             ];
         }
 
@@ -40,16 +42,18 @@ switch ($method) {
 
 
     case "POST":
-        $appointment = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO users (user_id, appointment_title, start, end, allDay, patient_id) 
-                    VALUES (null, :appointment_title, :start, :end, :allDay, :patient_id)";
+        $account = json_decode(file_get_contents('php://input'));
+        $sql = "INSERT INTO users (user_id, username, password) 
+            VALUES (null, :username, :password)";
+
         $stmt = $conn->prepare($sql);
-        $created_at = date('Y-m-d');
-        $stmt->bindParam(':appointment_title', $appointment->appointment_title);
-        $stmt->bindParam(':start', $appointment->start);
-        $stmt->bindParam(':end', $appointment->end);
-        $stmt->bindParam(':allDay', $appointment->allDay);
-        $stmt->bindParam(':patient_id', $appointment->patient_id);
+
+        $encrypted_username = md5($account->username);
+        $encrypted_password = md5($account->password);
+
+
+        $stmt->bindParam(':username', $encrypted_username);
+        $stmt->bindParam(':password', $encrypted_password);
 
 
 
@@ -58,12 +62,12 @@ switch ($method) {
         if ($stmt->execute()) {
             $response = [
                 "status" => "success",
-                "message" => "Appointment created successfully"
+                "message" => "Account created successfully"
             ];
         } else {
             $response = [
                 "status" => "error",
-                "message" => "Appointment creation failed"
+                "message" => "Account creation failed"
             ];
         }
 

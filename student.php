@@ -40,22 +40,32 @@ switch ($method) {
 
     case "POST":
         $stud = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO students (student_id, studentFirst, studentLast, image, groupAssigned, type, password, username) 
-        VALUES (null,  :studentFirst, :studentLast, :image, :groupAssigned, :type, :password, :username)";
+        $sql = "INSERT INTO students (student_id, studentFirst, studentLast, image, groupAssigned) 
+        VALUES (null,  :studentFirst, :studentLast, :image, :groupAssigned)";
 
 
         $stmt = $conn->prepare($sql);
-        $created_at = date('Y-m-d H:i:s');
         $stmt->bindParam(':studentFirst', $stud->studentFirst);
         $stmt->bindParam(':studentLast', $stud->studentLast);
         $stmt->bindParam(':image', $stud->image);
         $stmt->bindParam(':groupAssigned', $stud->groupAssigned);
-        $stmt->bindParam(':username', $stud->username);
-        $stmt->bindParam(':password', $stud->password);
-        $stmt->bindParam(':type', $stud->type);
+
+
+        $encrypted_username = md5($stud->username);
+        $encrypted_password = md5($stud->password);
 
 
         if ($stmt->execute()) {
+
+            $sql2 = "INSERT INTO users (user_id, username, password, type) 
+            VALUES (null, :username, :password, :type)";
+
+            $stmt2 = $conn->prepare($sql2);
+            $stmt2->bindParam(':username', $encrypted_username);
+            $stmt2->bindParam(':password', $encrypted_password);
+            $stmt2->bindParam(':type', $stud->type);
+
+            $stmt2->execute();
 
 
             $response = [
