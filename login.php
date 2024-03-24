@@ -43,8 +43,8 @@ switch ($method) {
 
     case "POST":
         $account = json_decode(file_get_contents('php://input'));
-        $sql = "INSERT INTO users (user_id, username, password) 
-            VALUES (null, :username, :password)";
+        $sql = "INSERT INTO users (user_id, username, password, type) 
+            VALUES (null, :username, :password, :type)";
 
         $stmt = $conn->prepare($sql);
 
@@ -54,6 +54,7 @@ switch ($method) {
 
         $stmt->bindParam(':username', $encrypted_username);
         $stmt->bindParam(':password', $encrypted_password);
+        $stmt->bindParam(':type', $account->type);
 
 
 
