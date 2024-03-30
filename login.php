@@ -1,6 +1,5 @@
 <?php
 
-
 include 'DBconnect.php';
 $objDB = new DbConnect();
 $conn = $objDB->connect();
@@ -19,6 +18,7 @@ switch ($method) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $encrypted_username);
         $stmt->bindParam(':password', $encrypted_password);
+
         $stmt->execute();
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
